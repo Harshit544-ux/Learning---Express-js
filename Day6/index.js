@@ -7,10 +7,18 @@ const app = express();
 
 app.use(express.json());
 
+
  app.post("/register",async (req,res)=>{
      await User.create(req.body);
      res.send("User Regstered Successfully")
  })
+
+
+
+app.get("/users",async(req,res)=>{
+    const users=await User.find()
+    res.send(users)
+})
 
 
 
