@@ -1,26 +1,42 @@
-// take the module of express js
-const express=require('express');
+const express = require("express");
+require("./database/config");
+const User = require("./model/userModal");
+ // DB connect ho raha hai
 
-//creating the instance of express js
-const app=express();
+const app = express();
 
-//parsing the json to object
 app.use(express.json());
 
-// GET routing / endpoint
-app.get("/",(req,res)=>{
-    res.send("get the data");
+// Feed the user data in Db
+app.post("/register",async (req,res)=>{
+     await User.create(req.body);
+     res.send("User Regstered Successfully")
+ })
+
+
+// Get all users from DB
+app.get("/users",async(req,res)=>{
+    const users=await User.find()
+    res.send(users)
 })
 
-//POST routing / endpoint
-app.post("/add_users",(req,res)=>{
-    console.log(req.body)
-    console.log(req.body.name);
-    console.log(req.body.city);
-    res.send("Data is saved");
+//Update user data in DB
+app.put("/users",async(req,res)=>{
+     const {id,...update}=req.body;
+      const updatedUser=await User.findByIdAndUpdate(id,update);
+      res.send(updatedUser);
+
 })
 
-// app is listening
-app.listen(4000,()=>{
-    console.log('app is listening at port no. 4000');
+
+//Delete user from DB
+app.delete("/users/:id",async(req,res)=>{
+     const {id}=req.params;
+      const deletedUser=await User.findByIdAndDelete(id);
+      res.send(deletedUser);
 })
+
+
+app.listen(4000, () => {
+  console.log("App is listening at port 4000");
+});
