@@ -7,17 +7,25 @@ const app = express();
 
 app.use(express.json());
 
-
- app.post("/register",async (req,res)=>{
+// Feed the user data in Db
+app.post("/register",async (req,res)=>{
      await User.create(req.body);
      res.send("User Regstered Successfully")
  })
 
 
-
+// Get all users from DB
 app.get("/users",async(req,res)=>{
     const users=await User.find()
     res.send(users)
+})
+
+//Update user data in DB
+app.put("/users",async(req,res)=>{
+     const {id,...update}=req.body;
+      const updatedUser=await User.findByIdAndUpdate(id,update);
+      res.send(updatedUser);
+
 })
 
 
