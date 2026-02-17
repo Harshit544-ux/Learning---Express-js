@@ -3,11 +3,13 @@ require("./database/config");
 const User = require("./model/userModal");
 const bcrypt=require("bcrypt");
 const validateUser = require("./utils/validateUser");
- // DB connect ho raha hai
+const jwt = require("jsonwebtoken");
+const cookie = require("cookie-parser")
 
 const app = express();
 
 app.use(express.json());
+app.use(cookie());
 
 // Feed the user data in Db
 app.post("/register",async (req,res)=>{
@@ -36,6 +38,8 @@ app.post("/login",async(req,res)=>{
     console.log(email,password)
       
     try{
+
+      
         //Find user by email in DB
         const userEmail =await User.findOne({email});
         console.log(userEmail);
@@ -46,13 +50,21 @@ app.post("/login",async(req,res)=>{
         }
 
         //compare the password
-        const isPasswordMatch= bcrypt.compare(password,userEmail.password);
+        const isPasswordMatch= await bcrypt.compare(password,userEmail.password);
       
         //password match nahi hua 
         if(!isPasswordMatch){
             throw new Error("Invalid password");
         }
-
+        
+        //generate the token
+        const token = jwt.sign(
+            {id:userEmail._id , email:userEmail.email},
+            "harshit"
+        )
+        console.log(token)
+        //send cookie
+        res.cookie("token",token)
         res.send("User logged in Successfully")
      
 
@@ -64,6 +76,20 @@ app.post("/login",async(req,res)=>{
 })
 
 
+app.get("/users",async(req,res)=>{
+
+   try{
+
+     const user = await User.find();
+    
+     res.send(user);
+
+   }catch(err){
+    res.send("Error in getting info : " + err.message);
+   }
+
+
+})
 
 
 app.listen(4000, () => {
