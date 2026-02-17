@@ -79,8 +79,21 @@ app.post("/login",async(req,res)=>{
 app.get("/users",async(req,res)=>{
 
    try{
+    //1.cookie se token nikalo
+    const token = req.cookies.token
+
+    if(!token){
+        throw new Error("Token not found")
+    }
+
+    //2.token verify karo
+     const decode_user = jwt.verify(token,"harshit");
+     console.log(decode_user);
 
      const user = await User.find();
+    //  console.log(req.cookies)
+
+    
     
      res.send(user);
 
